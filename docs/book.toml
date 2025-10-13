@@ -1,0 +1,10 @@
+[book]
+authors = [
+    "Mario Scuro <mscuro@fbk.eu>"
+    ]
+language = "en"
+src = "src"
+title = "pet-crypto-primitives-rs"
+
+[preprocessor.katex]
+after = ["links"]

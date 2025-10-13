@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: write 
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        feature: [p256, ristretto, p384]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Install cargo-deny
+        uses: baptiste0928/cargo-install@v3
+        with:
+          crate: cargo-deny
+          version: "^0.18"
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+        with:
+          shared-key: ${{ matrix.feature }}
+
+      - name: Format
+        run: cargo fmt --all -- --check
+
+      - name: Clippy (${{ matrix.feature }})
+        run: cargo clippy --no-default-features --features ${{ matrix.feature }} -- -D warnings
+
+      - name: Check dependencies (${{ matrix.feature }})
+        run: cargo deny --no-default-features --features ${{ matrix.feature }} check
+
+      - name: Tests (${{ matrix.feature }})
+        run: cargo test --no-default-features --features ${{ matrix.feature }}
+
+  docs:
+    name: Build & Deploy mdBook
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup mdBook
+        uses: peaceiris/actions-mdbook@v2
+        with:
+          mdbook-version: 'latest'
+
+      - name: Install Rust (for mdbook-katex)
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install mdbook-katex
+        run: cargo install mdbook-katex
+
+      - name: Build book
+        run: cd docs && mdbook build
+
+      - name: Deploy to GitHub Pages
+        if: ${{ github.ref == 'refs/heads/main' }}
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/book

@@ -1,0 +1,38 @@
+[package]
+name = "dlog-sigma-primitives"
+version = "0.1.0"
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+authors = [
+	"Mario Scuro <mscuro@fbk.eu>"
+	]
+readme = "README.md"
+
+[dependencies]
+dlog-group = { path = "../dlog-group", default-features = false}
+zeroize = { workspace = true }
+serde = { workspace = true, features = ["derive"] }
+merlin = { workspace = true }
+rand_core = { workspace = true }
+rand_chacha = { workspace = true }
+
+[features]
+default = ["ristretto"]
+p256 = ["dlog-group/p256"]
+k256 = ["dlog-group/k256"]
+p384 = ["dlog-group/p384"]
+ristretto = ["dlog-group/ristretto"]
+
+[dev-dependencies]
+criterion = { workspace = true }
+rand = { workspace = true }
+rand_chacha = { workspace = true }
+serde_json = { workspace = true }
+ed25519-dalek = { workspace = true }
+
+[package.metadata.docs.rs]
+# Build docs with a concrete backend so doctests compile.
+no-default-features = true
+features = ["p256"]
