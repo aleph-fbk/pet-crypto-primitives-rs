@@ -14,7 +14,7 @@ The goal of this project is to provide modular, composable, and group-agnostic b
 
 ## &#9888; Security Disclaimer
 
-This project has not been independently audited. Correctness and resistance to side-channel attacks are not guaranteed. The software is provided as is. **Use at your own risk**.
+This project has not been independently audited. Correctness and resistance to side-channel attacks are not guaranteed. The software is not ready for production use. **Use at your own risk**.
 
 ## Documentation
 
