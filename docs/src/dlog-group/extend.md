@@ -17,12 +17,3 @@ Once these are implemented, your group can be used interchangeably with existing
 
 It is recommended to include proper testing within any module that introduces new functionality. Additionally, if comparing performance is of interest, you can add benchmarks in the file `benches/group_bench.rs`, at the end of the file you can find examples of how the benchmarking macros (which take advantage of the `Group` trait) are used. 
 
-## Design Note
-
-The primary objective of this library is to provide a common interface for different prime-order group implementations. This enables users to write group-agnostic code that can switch between backends easily.
-
-The library assumes that the underlying group implementation:
-- Operates in **constant time** when appropriate,
-- Has a **prime order** (or uses a decaf-style abstraction to hide cofactors),
-- And correctly implements the group laws.
-

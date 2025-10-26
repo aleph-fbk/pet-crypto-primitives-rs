@@ -5,6 +5,7 @@
 - [Introduction](dlog-group/supported.md)
 - [User Guide](dlog-group/usage.md)
 - [Developer Guide](dlog-group/extend.md)
+- [Performance](dlog-group/performance.md)
 
 # dlog-sigma-primitives
 - [Introduction](dlog-sigma-primitives/intro.md)

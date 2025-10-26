@@ -1,6 +1,5 @@
 # Introduction
 ---
-
 `dlog-sigma-primitives` is a Rust crate offering discrete logarithm based cryptographic building blocks over elliptic curve groups. Group arithmetic and encodings are abstracted via the companion `dlog-group` crate, so the same protocols can be instantiated over any supported group.
 
 ## Cryptographic model
