@@ -54,13 +54,9 @@ let group_div = group_mul - &group_pow;
 assert_eq!(group_div, group_generator);
 ```
 
-## Documentation
-Use `cargo doc --all-features --open` to generate the crate documentation and open it.
-
-
 ## License
 
-Licensed under either of [Apache License Version 2.0](LICENSE-APACHE), or [MIT license](LICENSE-MIT).
+Licensed under either of [Apache License Version 2.0](../../LICENSE-APACHE), or [MIT license](../../LICENSE-MIT).
 
 
 ## Acknowledgments

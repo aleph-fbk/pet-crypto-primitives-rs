@@ -9,6 +9,10 @@ authors = [
 	"Mario Scuro <mscuro@fbk.eu>"
 	]
 readme = "README.md"
+description = "Collection of cryptographic primitives built on top of Elliptic Curve groups, with a focus on Zero-Knowledge Proofs."
+documentation = "https://aleph.fbk.eu/pet-crypto-primitives-rs/dlog-sigma-primitives/intro.html"
+keywords.workspace = true
+categories.workspace = true
 
 [dependencies]
 dlog-group = { path = "../dlog-group", default-features = false}
