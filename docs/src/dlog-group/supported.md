@@ -26,6 +26,13 @@ Curve cofactors have been the cause of [several vulnerabilities](https://ristret
 
 [`p256`] and [`p384`] curves have long been officially recommended by the National Institute of Standards and Technology (NIST). Additionally, since 2023, `Curve25519` is also included in the list of approved curves; see [SP 800-186](https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf).
 
+## Design goals
+
+The library assumes that the underlying group implementation:
+- Operates in **constant time** when appropriate,
+- Has a **prime order** (or uses a decaf-style abstraction to hide cofactors),
+- And correctly implements the group laws.
+
 [`ristretto`]: https://docs.rs/curve25519-dalek/latest/curve25519_dalek/ristretto/index.html
 [`p256`]: https://docs.rs/p256/latest/p256/
 [`k256`]: https://docs.rs/k256/latest/k256/

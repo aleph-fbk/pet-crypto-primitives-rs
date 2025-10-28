@@ -13,7 +13,7 @@ The library offers a wide range of proofs, from simple building blocks such as p
 
 ## &#9888; Security Disclaimer
 
-This project has not been independently audited. Correctness and resistance to side-channel attacks are not guaranteed. The software is provided as is. **Use at your own risk**.
+This project has not been independently audited. Correctness and resistance to side-channel attacks are not guaranteed. The software is not ready for production use. **Use at your own risk**.
 
 ## License
 

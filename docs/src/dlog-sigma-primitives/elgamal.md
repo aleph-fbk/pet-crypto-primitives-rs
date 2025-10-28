@@ -1,8 +1,6 @@
 # Modified ElGamal
-
 ---
-
-Modified ElGamal is a public key encryption scheme over a cyclic group of prime order that introduces a two-dimensional secret key and a three-component ciphertext. The change preserves the core guarantees of classical ElGamal (IND-CPA under DDH, rerandomizability, and homomorphism) while making the ciphertext structure more convenient for zero-knowledge proofs, shuffles, and threshold-style workflows.
+Modified ElGamal [[JCJ02]] is a public key encryption scheme over a cyclic group of prime order that introduces a two-dimensional secret key and a three-component ciphertext. The change preserves the core guarantees of classical ElGamal (IND-CPA under DDH, rerandomizability, and homomorphism) while making the ciphertext structure more convenient for zero-knowledge proofs, shuffles, and threshold-style workflows.
 
 ## Mathematical setting
 

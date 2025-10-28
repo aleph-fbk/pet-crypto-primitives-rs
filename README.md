@@ -8,28 +8,12 @@ This repository hosts a collection of Rust libraries for building **privacy-enha
 
 - **`dlog-group`**: abstraction layer over prime-order groups.
 - **`dlog-sigma-primitives`**: implementations of encryption schemes, commitments, and zero-knowledge proofs.
-- Documentation and developer guides built with [mdBook](https://rust-lang.github.io/mdBook/).
 
 The goal of this project is to provide modular, composable, and group-agnostic building blocks for cryptographic applications such as **secure voting and anonymous credentials**.
 
 ## &#9888; Security Disclaimer
 
-This project has not been independently audited. Correctness and resistance to side-channel attacks are not guaranteed. The software is provided as is. **Use at your own risk**.
-
-## Documentation
-
-The documentation is available online, or can be built locally:
-
-```bash
-cargo install mdbook mdbook-katex
-cd docs
-mdbook serve --open
-```
-
-Additionally, the API documentation can be compiled locally:
-```bash
-cargo doc --all-features --open
-```
+This project has not been independently audited. Correctness and resistance to side-channel attacks are not guaranteed. The software is not ready for production use. **Use at your own risk**.
 
 ## License
 

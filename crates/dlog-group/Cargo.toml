@@ -9,6 +9,10 @@ authors = [
 	"Mario Scuro <mscuro@fbk.eu>"
 	]
 readme = "README.md"
+description = "Unified wrapper around different prime-order cryptographic groups where the discrete log, computational Diffie–Hellman, and decisional Diffie–Hellman problems are believed to be hard."
+documentation = "https://aleph.fbk.eu/pet-crypto-primitives-rs/dlog-group/supported.html"
+keywords = ["cryptography", "ecc", "group-theory"]
+categories.workspace = true
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

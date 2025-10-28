@@ -1,10 +1,11 @@
 # Pedersen Commitments
 ---
-
-Pedersen commitments let a committer bind to a value while keeping it hidden, and later open it for verification. The scheme has two core properties:
+Pedersen commitments [[TPP91]] let a committer bind to a value while keeping it hidden, and later open it for verification. The scheme has two core properties:
 
 - Perfect hiding: the commitment leaks no information about the message.
 - Computational binding: after committing, it is infeasible to open to a different message assuming the hardness of discrete logarithm in the chosen group.
+
+[TPP91]: https://link.springer.com/chapter/10.1007/3-540-46766-1_9  
 
 ## Mathematical setting
 

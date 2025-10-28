@@ -1,7 +1,5 @@
 # Zero-Knowledge Proofs
-
 ---
-
 A **Zero-Knowledge Proof (ZKP)** is a cryptographic protocol that allows a prover to convince a verifier that a statement is true **without revealing any additional information** beyond the validity of the statement itself.
 
 The concept was introduced in the 1980s by Goldwasser, Micali, and Rackoff [[GMR85]], who formalized the idea of proving statements while preserving secrecy. Since then, ZKPs have become a central tool in modern cryptography.
@@ -121,15 +119,15 @@ The table below summarizes the supported proofs, the guarantees they provide, an
 
 | Proof Type                | What it Shows                                                                 | Example Application in E-Voting                |
 |----------------------------|-------------------------------------------------------------------------------|------------------------------------------------|
-| **Zero** | A ciphertext encodes the value zero | Building block for ballot validity and consistency checks |
-| **Disjunctive (OR)**      | A ciphertext encodes one value from a predefined set               | Proving each selection is either 0 or 1        |
+| **Zero** | An ElGamal ciphertext encodes the value zero | Building block for ballot validity and consistency checks |
+| **Disjunctive (OR)**      | An ElGamal ciphertext encodes one value from a predefined set               | Proving each selection is either 0 or 1        |
 | **Exponential (Exp)**     | Knowledge of the plaintext exponent in an exponential ElGamal ciphertext       | Encoding and proving selections as exponents   |
 | **Equality**              | Two group elements share the same discrete logarithm w.r.t. different bases   | Linking related ciphertexts for consistency    |
-| **Plaintext**             | Prover knows the plaintext inside a ciphertext (without revealing it)         | Ensuring the voter knows the vote they cast    |
-| **Not Identity (NotId)**  | A ciphertext does not encrypt the group identity   | Preventing malformed or trivial ballot fields  |
-| **Verifiable Decryption** | A ciphertext has been correctly decrypted under a public key scheme           | Publicly auditable tallying                    |
+| **Plaintext**             | Prover knows the plaintext inside an ElGamal ciphertext (without revealing it)         | Ensuring the voter knows the vote they cast    |
+| **Not Identity (NotId)**  | An ElGamal ciphertext does not encrypt the group identity   | Preventing malformed or trivial ballot fields  |
+| **Verifiable Decryption** | An ElGamal ciphertext has been correctly decrypted under a public key scheme           | Publicly auditable tallying                    |
 | **Designated Verifier**   | Proof validity can be checked only by a specific verifier with secret data     | Restricting credential checks to the voter   |
-| **Shuffle**               | A list of ciphertexts was permuted and re-randomized correctly                | Verifiable mixing of ballots in anonymization  |
+| **Shuffle**               | A list of ElGamal ciphertexts was permuted and re-randomized correctly                | Verifiable mixing of ballots in anonymization  |
 
 ## Example
 We show how to generate and verify a `Zero` proof. Examples for the other proofs are included in the API documentation. Thanks to the trait implementation, most proofs follows the exact same pattern.
