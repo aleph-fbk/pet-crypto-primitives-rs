@@ -192,9 +192,9 @@ dlog-sigma-primitives = { version = "x.y.z", features = ["p256"] }
 <li><code>serde</code> is a regular dependency of this crate. Types that are safe to serialize implement <code>Serialize</code> and <code>Deserialize</code> with no feature flag.</li>
 <li>Select exactly one concrete group via a crate feature on <code>dlog-sigma-primitives</code> (for example <code>p256</code>). These features forward to the underlying <code>dlog-group</code> backend.</li>
 <li>You only need a direct <code>dlog-group</code> dependency if you plan to call its APIs or need fine grained control over its own features beyond what this crate forwards.</li>
-<li>Randomness is provided via <code>rand_core</code>; transcripts and Fiat Shamir challenges use <code>merlin</code>. These are regular dependencies and require no special configuration.</li>
+<li>Randomness is provided via <code>rand_core</code>; transcripts and Fiat-Shamir challenges use <code>merlin</code>. These are regular dependencies and require no special configuration.</li>
 </ol>
-<p>API documentation will be available online after publishing:</p>
+<p>API documentation are available online:</p>
 <ul>
 <li>Crate page on crates.io: https://crates.io/crates/dlog-sigma-primitives</li>
 <li>API docs on docs.rs: https://docs.rs/dlog-sigma-primitives</li>
@@ -204,30 +204,30 @@ dlog-sigma-primitives = { version = "x.y.z", features = ["p256"] }
 <li>
 <p>ElGamal encryption (modified and exponential).</p>
 <ul>
-<li>Modified ElGamal: a rerandomizable ElGamal variant tailored to verifiable shuffles and mixnets. It exposes ciphertext and randomness structures convenient for proof composition. <a href="https://eprint.iacr.org/2002/165">JCJ02</a></li>
+<li>Modified ElGamal: a rerandomizable ElGamal variant tailored to verifiable shuffles and mixnets. It exposes ciphertext and randomness structures convenient for proof composition. [<a href="https://eprint.iacr.org/2002/165">JCJ02</a>]</li>
 <li>Exponential ElGamal: plaintexts are represented in the exponent, enabling linear relations on messages to be proven with compact Sigma protocols.</li>
 </ul>
 </li>
 <li>
 <p>Pedersen commitments.</p>
 <ul>
-<li>Additively homomorphic commitments of the form <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span></span></span></span></span></span></span></span>, with binding under DL in G and perfect hiding for uniformly random <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span>. <a href="https://link.springer.com/chapter/10.1007/3-540-46766-1_9">TPP91</a></li>
+<li>Additively homomorphic commitments of the form <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span></span></span></span></span></span></span></span>, with binding under DL in G and perfect hiding for uniformly random <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span>. [<a href="https://link.springer.com/chapter/10.1007/3-540-46766-1_9">TPP91</a>]</li>
 <li>Designed to compose with the proof system below.</li>
 </ul>
 </li>
 <li>
 <p>Sigma protocols and non interactive zero knowledge proofs for DL relations.</p>
 <ul>
-<li>Schnorr type proofs for knowledge of discrete logs and linear relations among logs. <a href="https://crypto.ethz.ch/publications/files/CamSta97b.pdf">CS97</a></li>
+<li>Schnorr type proofs for knowledge of discrete logs and linear relations among logs. [<a href="https://crypto.ethz.ch/publications/files/CamSta97b.pdf">CS97</a>]</li>
 <li>Relation specific statements used in the crate include:
 <ul>
 <li>Zero plaintext proofs for ElGamal ciphertexts, i.e., proofs that a ciphertext encrypts m = 0 without revealing the randomness.</li>
 <li>Equality of discrete logs across independent bases.</li>
 <li>Disjunctive (OR) proofs for alternative witnesses.</li>
-<li>Designated verifier proofs that bind verification to a verifier secret. <a href="https://link.springer.com/chapter/10.1007/3-540-68339-9_13">JSB96</a></li>
+<li>Designated verifier proofs that bind verification to a verifier secret. [<a href="https://link.springer.com/chapter/10.1007/3-540-68339-9_13">JSB96</a>]</li>
 </ul>
 </li>
-<li>All proofs are rendered non interactive via Fiat Shamir using <code>merlin</code> for transcript construction and challenge derivation. <a href="https://link.springer.com/chapter/10.1007/3-540-47721-7_12">FS86</a></li>
+<li>All proofs are rendered non interactive via Fiat Shamir using <code>merlin</code> for transcript construction and challenge derivation. [<a href="https://link.springer.com/chapter/10.1007/3-540-47721-7_12">FS86</a>]</li>
 </ul>
 </li>
 </ol>

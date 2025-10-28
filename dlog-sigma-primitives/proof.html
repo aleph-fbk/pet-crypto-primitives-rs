@@ -289,15 +289,15 @@ proof.verify(public)?;</code></pre>
 <p>This library includes a collection of zero-knowledge proofs that can be used as <strong>modular building blocks</strong> in cryptographic systems. Each proof enforces a specific algebraic property (e.g., equality of discrete logs, correct shuffling, or consistency with a reference value) and can be combined with others to enforce more complex constraints.</p>
 <p>The table below summarizes the supported proofs, the guarantees they provide, and a representative application in e-voting systems:</p>
 <div class="table-wrapper"><table><thead><tr><th>Proof Type</th><th>What it Shows</th><th>Example Application in E-Voting</th></tr></thead><tbody>
-<tr><td><strong>Zero</strong></td><td>A ciphertext encodes the value zero</td><td>Building block for ballot validity and consistency checks</td></tr>
-<tr><td><strong>Disjunctive (OR)</strong></td><td>A ciphertext encodes one value from a predefined set</td><td>Proving each selection is either 0 or 1</td></tr>
+<tr><td><strong>Zero</strong></td><td>An ElGamal ciphertext encodes the value zero</td><td>Building block for ballot validity and consistency checks</td></tr>
+<tr><td><strong>Disjunctive (OR)</strong></td><td>An ElGamal ciphertext encodes one value from a predefined set</td><td>Proving each selection is either 0 or 1</td></tr>
 <tr><td><strong>Exponential (Exp)</strong></td><td>Knowledge of the plaintext exponent in an exponential ElGamal ciphertext</td><td>Encoding and proving selections as exponents</td></tr>
 <tr><td><strong>Equality</strong></td><td>Two group elements share the same discrete logarithm w.r.t. different bases</td><td>Linking related ciphertexts for consistency</td></tr>
-<tr><td><strong>Plaintext</strong></td><td>Prover knows the plaintext inside a ciphertext (without revealing it)</td><td>Ensuring the voter knows the vote they cast</td></tr>
-<tr><td><strong>Not Identity (NotId)</strong></td><td>A ciphertext does not encrypt the group identity</td><td>Preventing malformed or trivial ballot fields</td></tr>
-<tr><td><strong>Verifiable Decryption</strong></td><td>A ciphertext has been correctly decrypted under a public key scheme</td><td>Publicly auditable tallying</td></tr>
+<tr><td><strong>Plaintext</strong></td><td>Prover knows the plaintext inside an ElGamal ciphertext (without revealing it)</td><td>Ensuring the voter knows the vote they cast</td></tr>
+<tr><td><strong>Not Identity (NotId)</strong></td><td>An ElGamal ciphertext does not encrypt the group identity</td><td>Preventing malformed or trivial ballot fields</td></tr>
+<tr><td><strong>Verifiable Decryption</strong></td><td>An ElGamal ciphertext has been correctly decrypted under a public key scheme</td><td>Publicly auditable tallying</td></tr>
 <tr><td><strong>Designated Verifier</strong></td><td>Proof validity can be checked only by a specific verifier with secret data</td><td>Restricting credential checks to the voter</td></tr>
-<tr><td><strong>Shuffle</strong></td><td>A list of ciphertexts was permuted and re-randomized correctly</td><td>Verifiable mixing of ballots in anonymization</td></tr>
+<tr><td><strong>Shuffle</strong></td><td>A list of ElGamal ciphertexts was permuted and re-randomized correctly</td><td>Verifiable mixing of ballots in anonymization</td></tr>
 </tbody></table>
 </div>
 <h2 id="example"><a class="header" href="#example">Example</a></h2>

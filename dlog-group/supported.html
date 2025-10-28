@@ -194,6 +194,13 @@ and <a href="https://en.wikipedia.org/wiki/Discrete_logarithm">discrete log</a> 
 <p>Curve cofactors have been the cause of <a href="https://ristretto.group/why_ristretto.html#pitfalls-of-a-cofactor">several vulnerabilities</a>, however, when properly handled, they can allow for much better performance.</p>
 <p><a href="https://docs.rs/curve25519-dalek/latest/curve25519_dalek/ristretto/index.html"><code>ristretto</code></a> addresses these issues by providing a prime-order group abstraction over <code>Curve25519</code>.</p>
 <p><a href="https://docs.rs/p256/latest/p256/"><code>p256</code></a> and <a href="https://docs.rs/p384/latest/p384/"><code>p384</code></a> curves have long been officially recommended by the National Institute of Standards and Technology (NIST). Additionally, since 2023, <code>Curve25519</code> is also included in the list of approved curves; see <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf">SP 800-186</a>.</p>
+<h2 id="design-goals"><a class="header" href="#design-goals">Design goals</a></h2>
+<p>The library assumes that the underlying group implementation:</p>
+<ul>
+<li>Operates in <strong>constant time</strong> when appropriate,</li>
+<li>Has a <strong>prime order</strong> (or uses a decaf-style abstraction to hide cofactors),</li>
+<li>And correctly implements the group laws.</li>
+</ul>
 
                     </main>
 

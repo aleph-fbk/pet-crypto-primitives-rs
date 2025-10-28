@@ -179,15 +179,14 @@
 <h1 id="user-guide"><a class="header" href="#user-guide">User Guide</a></h1>
 <hr />
 <h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
-<p>Currently, <code>dlog-group</code> is not published on <a href="https://crates.io/">crates.io</a>, so in order to use it you must download the library locally and reference it in your Cargo.toml:</p>
-<pre><code class="language-toml">[dependencies]
-dlog-group = {path = ./your-path-to/dlog-group}
+<p><code>dlog-group</code> is published on crates.io. Add via Cargo:</p>
+<pre><code class="language-bash">cargo add dlog-group --features p256
 </code></pre>
-<p>By default, only the <code>RistrettoGroup</code> backend is compiled. Additional groups are available behind feature flags. To enable them, specify the desired features:</p>
+<p>Or add entries manually to your <code>Cargo.toml</code> (replace the version with the latest on crates.io):</p>
 <pre><code class="language-toml">[dependencies]
-dlog-group = {path = ./your-path-to/dlog-group, features = ["p256"]}
+dlog-group = { version = "x.y.z", features = ["p256"] }
 </code></pre>
-<p>Available feature flags include: <code>"p256"</code>, <code>"k256"</code> and <code>"p384"</code>.</p>
+<p>Available feature flags include: <code>"ristretto", "p256"</code>, <code>"k256"</code> and <code>"p384"</code>.</p>
 <h2 id="usage"><a class="header" href="#usage">Usage</a></h2>
 <p>Once a group <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span> is selected (following standard elliptic-curve conventions, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span> is considered an additive group), we can distinguish two main components:</p>
 <ol>
@@ -199,9 +198,6 @@ dlog-group = {path = ./your-path-to/dlog-group, features = ["p256"]}
 </li>
 </ol>
 <p>These two structures support standard algebraic operations and are the basis for cryptographic schemes like Diffie–Hellman and digital signatures.</p>
-<p>To view a complete list of available functionalities, you can compile and open the complete API documentation with:</p>
-<pre><code class="language-bash">cargo doc --all-features --open
-</code></pre>
 <h3 id="example"><a class="header" href="#example">Example</a></h3>
 <p>First, we import a backend implementation (in this case, <code>RistrettoGroup</code>) as well as the traits <code>GroupPoint</code> and <code>GroupScalar</code>, which provide operations over points and scalars, respectively:</p>
 <pre><code class="language-rust  ignore">use dlog_group::{
@@ -220,15 +216,7 @@ let r_G = G * &amp;r;
 let r1_G = G + &amp;r_G;
 
 assert_eq!(r1_G - &amp;r_G, G);</code></pre>
-<h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
-<p>We report the timings of the main operations for each supported curve, where <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">Q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span> and <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbb">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>. Note that performance is not the only metric to consider when choosing a curve, for example, P384 offers a higher security level (in bits) compared to the others. The data below was collected on an Intel® Core™ Ultra 7 165H and is represented in nanoseconds (ns).</p>
-<div class="table-wrapper"><table><thead><tr><th>Operation</th><th>Ristretto</th><th>K256</th><th>P256</th><th>P384</th></tr></thead><tbody>
-<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mclose">]</span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span></span></span></span></td><td>24,168</td><td>29,407</td><td>90,251</td><td>379,02</td></tr>
-<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span></td><td>139.93</td><td>172.77</td><td>265.80</td><td>762.73</td></tr>
-<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span></td><td>17.263</td><td>8.7378</td><td>8.8894</td><td>14.125</td></tr>
-<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4445em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span></td><td>60.127</td><td>24.545</td><td>45.440</td><td>46.204</td></tr>
-</tbody></table>
-</div>
+
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

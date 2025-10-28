@@ -194,14 +194,6 @@
 </ul>
 <p>Once these are implemented, your group can be used interchangeably with existing ones like <code>RistrettoGroup</code>, <code>P256Group</code>, or others, benefiting from the abstraction provided by the library.</p>
 <p>It is recommended to include proper testing within any module that introduces new functionality. Additionally, if comparing performance is of interest, you can add benchmarks in the file <code>benches/group_bench.rs</code>, at the end of the file you can find examples of how the benchmarking macros (which take advantage of the <code>Group</code> trait) are used.</p>
-<h2 id="design-note"><a class="header" href="#design-note">Design Note</a></h2>
-<p>The primary objective of this library is to provide a common interface for different prime-order group implementations. This enables users to write group-agnostic code that can switch between backends easily.</p>
-<p>The library assumes that the underlying group implementation:</p>
-<ul>
-<li>Operates in <strong>constant time</strong> when appropriate,</li>
-<li>Has a <strong>prime order</strong> (or uses a decaf-style abstraction to hide cofactors),</li>
-<li>And correctly implements the group laws.</li>
-</ul>
 
                     </main>
 
@@ -211,7 +203,7 @@
                                 <i class="fa fa-angle-left"></i>
                             </a>
 
-                            <a rel="next prefetch" href="../dlog-sigma-primitives/intro.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                            <a rel="next prefetch" href="../dlog-group/performance.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                                 <i class="fa fa-angle-right"></i>
                             </a>
 
@@ -225,7 +217,7 @@
                         <i class="fa fa-angle-left"></i>
                     </a>
 
-                    <a rel="next prefetch" href="../dlog-sigma-primitives/intro.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                    <a rel="next prefetch" href="../dlog-group/performance.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
                         <i class="fa fa-angle-right"></i>
                     </a>
             </nav>

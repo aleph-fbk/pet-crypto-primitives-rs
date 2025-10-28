@@ -185,20 +185,10 @@
 <ul>
 <li><strong><code>dlog-group</code></strong>: abstraction layer over prime-order groups.</li>
 <li><strong><code>dlog-sigma-primitives</code></strong>: implementations of encryption schemes, commitments, and zero-knowledge proofs.</li>
-<li>Documentation and developer guides built with <a href="https://rust-lang.github.io/mdBook/">mdBook</a>.</li>
 </ul>
 <p>The goal of this project is to provide modular, composable, and group-agnostic building blocks for cryptographic applications such as <strong>secure voting and anonymous credentials</strong>.</p>
 <h2 id="-security-disclaimer"><a class="header" href="#-security-disclaimer">⚠ Security Disclaimer</a></h2>
-<p>This project has not been independently audited. Correctness and resistance to side-channel attacks are not guaranteed. The software is provided as is. <strong>Use at your own risk</strong>.</p>
-<h2 id="documentation"><a class="header" href="#documentation">Documentation</a></h2>
-<p>The documentation is available online, or can be built locally:</p>
-<pre><code class="language-bash">cargo install mdbook mdbook-katex
-cd docs
-mdbook serve --open
-</code></pre>
-<p>Additionally, the API documentation can be compiled locally:</p>
-<pre><code class="language-bash">cargo doc --all-features --open
-</code></pre>
+<p>This project has not been independently audited. Correctness and resistance to side-channel attacks are not guaranteed. The software is not ready for production use. <strong>Use at your own risk</strong>.</p>
 <h2 id="license"><a class="header" href="#license">License</a></h2>
 <p>Licensed under either of <a href="../../LICENSE-APACHE">Apache License Version 2.0</a>, or <a href="../../LICENSE-MIT">MIT license</a>.</p>
 <h2 id="acknowledgments"><a class="header" href="#acknowledgments">Acknowledgments</a></h2>
@@ -222,19 +212,25 @@ and <a href="https://en.wikipedia.org/wiki/Discrete_logarithm">discrete log</a> 
 <p>Curve cofactors have been the cause of <a href="https://ristretto.group/why_ristretto.html#pitfalls-of-a-cofactor">several vulnerabilities</a>, however, when properly handled, they can allow for much better performance.</p>
 <p><a href="https://docs.rs/curve25519-dalek/latest/curve25519_dalek/ristretto/index.html"><code>ristretto</code></a> addresses these issues by providing a prime-order group abstraction over <code>Curve25519</code>.</p>
 <p><a href="https://docs.rs/p256/latest/p256/"><code>p256</code></a> and <a href="https://docs.rs/p384/latest/p384/"><code>p384</code></a> curves have long been officially recommended by the National Institute of Standards and Technology (NIST). Additionally, since 2023, <code>Curve25519</code> is also included in the list of approved curves; see <a href="https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-186.pdf">SP 800-186</a>.</p>
+<h2 id="design-goals"><a class="header" href="#design-goals">Design goals</a></h2>
+<p>The library assumes that the underlying group implementation:</p>
+<ul>
+<li>Operates in <strong>constant time</strong> when appropriate,</li>
+<li>Has a <strong>prime order</strong> (or uses a decaf-style abstraction to hide cofactors),</li>
+<li>And correctly implements the group laws.</li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
 <h1 id="user-guide"><a class="header" href="#user-guide">User Guide</a></h1>
 <hr />
 <h2 id="installation"><a class="header" href="#installation">Installation</a></h2>
-<p>Currently, <code>dlog-group</code> is not published on <a href="https://crates.io/">crates.io</a>, so in order to use it you must download the library locally and reference it in your Cargo.toml:</p>
-<pre><code class="language-toml">[dependencies]
-dlog-group = {path = ./your-path-to/dlog-group}
+<p><code>dlog-group</code> is published on crates.io. Add via Cargo:</p>
+<pre><code class="language-bash">cargo add dlog-group --features p256
 </code></pre>
-<p>By default, only the <code>RistrettoGroup</code> backend is compiled. Additional groups are available behind feature flags. To enable them, specify the desired features:</p>
+<p>Or add entries manually to your <code>Cargo.toml</code> (replace the version with the latest on crates.io):</p>
 <pre><code class="language-toml">[dependencies]
-dlog-group = {path = ./your-path-to/dlog-group, features = ["p256"]}
+dlog-group = { version = "x.y.z", features = ["p256"] }
 </code></pre>
-<p>Available feature flags include: <code>"p256"</code>, <code>"k256"</code> and <code>"p384"</code>.</p>
+<p>Available feature flags include: <code>"ristretto", "p256"</code>, <code>"k256"</code> and <code>"p384"</code>.</p>
 <h2 id="usage"><a class="header" href="#usage">Usage</a></h2>
 <p>Once a group <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span> is selected (following standard elliptic-curve conventions, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span> is considered an additive group), we can distinguish two main components:</p>
 <ol>
@@ -246,9 +242,6 @@ dlog-group = {path = ./your-path-to/dlog-group, features = ["p256"]}
 </li>
 </ol>
 <p>These two structures support standard algebraic operations and are the basis for cryptographic schemes like Diffie–Hellman and digital signatures.</p>
-<p>To view a complete list of available functionalities, you can compile and open the complete API documentation with:</p>
-<pre><code class="language-bash">cargo doc --all-features --open
-</code></pre>
 <h3 id="example"><a class="header" href="#example">Example</a></h3>
 <p>First, we import a backend implementation (in this case, <code>RistrettoGroup</code>) as well as the traits <code>GroupPoint</code> and <code>GroupScalar</code>, which provide operations over points and scalars, respectively:</p>
 <pre><code class="language-rust  ignore">use dlog_group::{
@@ -267,15 +260,7 @@ let r_G = G * &amp;r;
 let r1_G = G + &amp;r_G;
 
 assert_eq!(r1_G - &amp;r_G, G);</code></pre>
-<h2 id="performance"><a class="header" href="#performance">Performance</a></h2>
-<p>We report the timings of the main operations for each supported curve, where <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">Q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span> and <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbb">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>. Note that performance is not the only metric to consider when choosing a curve, for example, P384 offers a higher security level (in bits) compared to the others. The data below was collected on an Intel® Core™ Ultra 7 165H and is represented in nanoseconds (ns).</p>
-<div class="table-wrapper"><table><thead><tr><th>Operation</th><th>Ristretto</th><th>K256</th><th>P256</th><th>P384</th></tr></thead><tbody>
-<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mclose">]</span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span></span></span></span></td><td>24,168</td><td>29,407</td><td>90,251</td><td>379,02</td></tr>
-<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span></td><td>139.93</td><td>172.77</td><td>265.80</td><td>762.73</td></tr>
-<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span></td><td>17.263</td><td>8.7378</td><td>8.8894</td><td>14.125</td></tr>
-<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4445em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span></td><td>60.127</td><td>24.545</td><td>45.440</td><td>46.204</td></tr>
-</tbody></table>
-</div><div style="break-before: page; page-break-before: always;"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<div style="break-before: page; page-break-before: always;"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
 <h1 id="developer-guide"><a class="header" href="#developer-guide">Developer Guide</a></h1>
 <hr />
 <h2 id="group-trait"><a class="header" href="#group-trait">Group Trait</a></h2>
@@ -294,21 +279,23 @@ assert_eq!(r1_G - &amp;r_G, G);</code></pre>
 </ul>
 <p>Once these are implemented, your group can be used interchangeably with existing ones like <code>RistrettoGroup</code>, <code>P256Group</code>, or others, benefiting from the abstraction provided by the library.</p>
 <p>It is recommended to include proper testing within any module that introduces new functionality. Additionally, if comparing performance is of interest, you can add benchmarks in the file <code>benches/group_bench.rs</code>, at the end of the file you can find examples of how the benchmarking macros (which take advantage of the <code>Group</code> trait) are used.</p>
-<h2 id="design-note"><a class="header" href="#design-note">Design Note</a></h2>
-<p>The primary objective of this library is to provide a common interface for different prime-order group implementations. This enables users to write group-agnostic code that can switch between backends easily.</p>
-<p>The library assumes that the underlying group implementation:</p>
-<ul>
-<li>Operates in <strong>constant time</strong> when appropriate,</li>
-<li>Has a <strong>prime order</strong> (or uses a decaf-style abstraction to hide cofactors),</li>
-<li>And correctly implements the group laws.</li>
-</ul>
 <div style="break-before: page; page-break-before: always;"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="performance"><a class="header" href="#performance">Performance</a></h1>
+<hr />
+<p>We report the timings of the main operations for each supported curve, where <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">Q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span> and <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">a</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">b</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbb">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>. Note that performance is not the only metric to consider when choosing a curve, for example, P384 offers a higher security level (in bits) compared to the others. The data below was collected on an Intel® Core™ Ultra 7 165H and is represented in nanoseconds (ns).</p>
+<div class="table-wrapper"><table><thead><tr><th>Operation</th><th>Ristretto</th><th>K256</th><th>P256</th><th>P384</th></tr></thead><tbody>
+<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mclose">]</span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span></span></span></span></td><td>24,168</td><td>29,407</td><td>90,251</td><td>379,02</td></tr>
+<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span></td><td>139.93</td><td>172.77</td><td>265.80</td><td>762.73</td></tr>
+<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span></td><td>17.263</td><td>8.7378</td><td>8.8894</td><td>14.125</td></tr>
+<tr><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4445em;"></span><span class="mord mathnormal">a</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">b</span></span></span></span></td><td>60.127</td><td>24.545</td><td>45.440</td><td>46.204</td></tr>
+</tbody></table>
+</div><div style="break-before: page; page-break-before: always;"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
 <h1 id="introduction-1"><a class="header" href="#introduction-1">Introduction</a></h1>
 <hr />
 <p><code>dlog-sigma-primitives</code> is a Rust crate offering discrete logarithm based cryptographic building blocks over elliptic curve groups. Group arithmetic and encodings are abstracted via the companion <code>dlog-group</code> crate, so the same protocols can be instantiated over any supported group.</p>
 <h2 id="cryptographic-model"><a class="header" href="#cryptographic-model">Cryptographic model</a></h2>
 <p>Let <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span> be a cyclic group of prime order <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span> with generator <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">g</span></span></span></span>, in this documentation we assume it written multiplicatively even if the implementation is written additively. Secrets and randomness are sampled from <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.975em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathbb">Z</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">p</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>; public elements live in <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span>. All statements and proofs in this crate are expressed as relations among discrete logarithms in <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span>. Security relies on the standard hardness of the discrete logarithm problem in <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span> and, where required, on DDH style indistinguishability. Non-interactive proofs are obtained from Sigma protocols using the Fiat-Shamir transform in the random oracle model, with challenge values derived from domain separated transcripts using the <code>merlin</code> crate.</p>
-<h2 id="design-goals"><a class="header" href="#design-goals">Design goals</a></h2>
+<h2 id="design-goals-1"><a class="header" href="#design-goals-1">Design goals</a></h2>
 <ul>
 <li><strong>Composable</strong>. Proofs share uniform traits so that complex statements can be built easily.</li>
 <li><strong>Explicit transcripts</strong>. Every challenge is derived from a transcript with clear domain separation.</li>
@@ -331,9 +318,9 @@ dlog-sigma-primitives = { version = "x.y.z", features = ["p256"] }
 <li><code>serde</code> is a regular dependency of this crate. Types that are safe to serialize implement <code>Serialize</code> and <code>Deserialize</code> with no feature flag.</li>
 <li>Select exactly one concrete group via a crate feature on <code>dlog-sigma-primitives</code> (for example <code>p256</code>). These features forward to the underlying <code>dlog-group</code> backend.</li>
 <li>You only need a direct <code>dlog-group</code> dependency if you plan to call its APIs or need fine grained control over its own features beyond what this crate forwards.</li>
-<li>Randomness is provided via <code>rand_core</code>; transcripts and Fiat Shamir challenges use <code>merlin</code>. These are regular dependencies and require no special configuration.</li>
+<li>Randomness is provided via <code>rand_core</code>; transcripts and Fiat-Shamir challenges use <code>merlin</code>. These are regular dependencies and require no special configuration.</li>
 </ol>
-<p>API documentation will be available online after publishing:</p>
+<p>API documentation are available online:</p>
 <ul>
 <li>Crate page on crates.io: https://crates.io/crates/dlog-sigma-primitives</li>
 <li>API docs on docs.rs: https://docs.rs/dlog-sigma-primitives</li>
@@ -343,37 +330,37 @@ dlog-sigma-primitives = { version = "x.y.z", features = ["p256"] }
 <li>
 <p>ElGamal encryption (modified and exponential).</p>
 <ul>
-<li>Modified ElGamal: a rerandomizable ElGamal variant tailored to verifiable shuffles and mixnets. It exposes ciphertext and randomness structures convenient for proof composition. <a href="https://eprint.iacr.org/2002/165">JCJ02</a></li>
+<li>Modified ElGamal: a rerandomizable ElGamal variant tailored to verifiable shuffles and mixnets. It exposes ciphertext and randomness structures convenient for proof composition. [<a href="https://eprint.iacr.org/2002/165">JCJ02</a>]</li>
 <li>Exponential ElGamal: plaintexts are represented in the exponent, enabling linear relations on messages to be proven with compact Sigma protocols.</li>
 </ul>
 </li>
 <li>
 <p>Pedersen commitments.</p>
 <ul>
-<li>Additively homomorphic commitments of the form <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span></span></span></span></span></span></span></span>, with binding under DL in G and perfect hiding for uniformly random <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span>. <a href="https://link.springer.com/chapter/10.1007/3-540-46766-1_9">TPP91</a></li>
+<li>Additively homomorphic commitments of the form <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">m</span></span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">h</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.02778em;">r</span></span></span></span></span></span></span></span></span></span></span>, with binding under DL in G and perfect hiding for uniformly random <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span></span></span></span>. [<a href="https://link.springer.com/chapter/10.1007/3-540-46766-1_9">TPP91</a>]</li>
 <li>Designed to compose with the proof system below.</li>
 </ul>
 </li>
 <li>
 <p>Sigma protocols and non interactive zero knowledge proofs for DL relations.</p>
 <ul>
-<li>Schnorr type proofs for knowledge of discrete logs and linear relations among logs. <a href="https://crypto.ethz.ch/publications/files/CamSta97b.pdf">CS97</a></li>
+<li>Schnorr type proofs for knowledge of discrete logs and linear relations among logs. [<a href="https://crypto.ethz.ch/publications/files/CamSta97b.pdf">CS97</a>]</li>
 <li>Relation specific statements used in the crate include:
 <ul>
 <li>Zero plaintext proofs for ElGamal ciphertexts, i.e., proofs that a ciphertext encrypts m = 0 without revealing the randomness.</li>
 <li>Equality of discrete logs across independent bases.</li>
 <li>Disjunctive (OR) proofs for alternative witnesses.</li>
-<li>Designated verifier proofs that bind verification to a verifier secret. <a href="https://link.springer.com/chapter/10.1007/3-540-68339-9_13">JSB96</a></li>
+<li>Designated verifier proofs that bind verification to a verifier secret. [<a href="https://link.springer.com/chapter/10.1007/3-540-68339-9_13">JSB96</a>]</li>
 </ul>
 </li>
-<li>All proofs are rendered non interactive via Fiat Shamir using <code>merlin</code> for transcript construction and challenge derivation. <a href="https://link.springer.com/chapter/10.1007/3-540-47721-7_12">FS86</a></li>
+<li>All proofs are rendered non interactive via Fiat Shamir using <code>merlin</code> for transcript construction and challenge derivation. [<a href="https://link.springer.com/chapter/10.1007/3-540-47721-7_12">FS86</a>]</li>
 </ul>
 </li>
 </ol>
 <div style="break-before: page; page-break-before: always;"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
 <h1 id="modified-elgamal"><a class="header" href="#modified-elgamal">Modified ElGamal</a></h1>
 <hr />
-<p>Modified ElGamal is a public key encryption scheme over a cyclic group of prime order that introduces a two-dimensional secret key and a three-component ciphertext. The change preserves the core guarantees of classical ElGamal (IND-CPA under DDH, rerandomizability, and homomorphism) while making the ciphertext structure more convenient for zero-knowledge proofs, shuffles, and threshold-style workflows.</p>
+<p>Modified ElGamal [<a href="https://eprint.iacr.org/2002/165">JCJ02</a>] is a public key encryption scheme over a cyclic group of prime order that introduces a two-dimensional secret key and a three-component ciphertext. The change preserves the core guarantees of classical ElGamal (IND-CPA under DDH, rerandomizability, and homomorphism) while making the ciphertext structure more convenient for zero-knowledge proofs, shuffles, and threshold-style workflows.</p>
 <h2 id="mathematical-setting"><a class="header" href="#mathematical-setting">Mathematical setting</a></h2>
 <p>Let <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span> be a cyclic group of prime order <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">p</span></span></span></span> with independent generators <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6889em;"></span><span class="mord mathbb">G</span></span></span></span>.</p>
 <ul>
@@ -438,7 +425,7 @@ assert_eq!(m, m_dec);
 <div style="break-before: page; page-break-before: always;"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
 <h1 id="pedersen-commitments"><a class="header" href="#pedersen-commitments">Pedersen Commitments</a></h1>
 <hr />
-<p>Pedersen commitments let a committer bind to a value while keeping it hidden, and later open it for verification. The scheme has two core properties:</p>
+<p>Pedersen commitments [<a href="https://link.springer.com/chapter/10.1007/3-540-46766-1_9">TPP91</a>] let a committer bind to a value while keeping it hidden, and later open it for verification. The scheme has two core properties:</p>
 <ul>
 <li>Perfect hiding: the commitment leaks no information about the message.</li>
 <li>Computational binding: after committing, it is infeasible to open to a different message assuming the hardness of discrete logarithm in the chosen group.</li>
@@ -619,15 +606,15 @@ proof.verify(public)?;</code></pre>
 <p>This library includes a collection of zero-knowledge proofs that can be used as <strong>modular building blocks</strong> in cryptographic systems. Each proof enforces a specific algebraic property (e.g., equality of discrete logs, correct shuffling, or consistency with a reference value) and can be combined with others to enforce more complex constraints.</p>
 <p>The table below summarizes the supported proofs, the guarantees they provide, and a representative application in e-voting systems:</p>
 <div class="table-wrapper"><table><thead><tr><th>Proof Type</th><th>What it Shows</th><th>Example Application in E-Voting</th></tr></thead><tbody>
-<tr><td><strong>Zero</strong></td><td>A ciphertext encodes the value zero</td><td>Building block for ballot validity and consistency checks</td></tr>
-<tr><td><strong>Disjunctive (OR)</strong></td><td>A ciphertext encodes one value from a predefined set</td><td>Proving each selection is either 0 or 1</td></tr>
+<tr><td><strong>Zero</strong></td><td>An ElGamal ciphertext encodes the value zero</td><td>Building block for ballot validity and consistency checks</td></tr>
+<tr><td><strong>Disjunctive (OR)</strong></td><td>An ElGamal ciphertext encodes one value from a predefined set</td><td>Proving each selection is either 0 or 1</td></tr>
 <tr><td><strong>Exponential (Exp)</strong></td><td>Knowledge of the plaintext exponent in an exponential ElGamal ciphertext</td><td>Encoding and proving selections as exponents</td></tr>
 <tr><td><strong>Equality</strong></td><td>Two group elements share the same discrete logarithm w.r.t. different bases</td><td>Linking related ciphertexts for consistency</td></tr>
-<tr><td><strong>Plaintext</strong></td><td>Prover knows the plaintext inside a ciphertext (without revealing it)</td><td>Ensuring the voter knows the vote they cast</td></tr>
-<tr><td><strong>Not Identity (NotId)</strong></td><td>A ciphertext does not encrypt the group identity</td><td>Preventing malformed or trivial ballot fields</td></tr>
-<tr><td><strong>Verifiable Decryption</strong></td><td>A ciphertext has been correctly decrypted under a public key scheme</td><td>Publicly auditable tallying</td></tr>
+<tr><td><strong>Plaintext</strong></td><td>Prover knows the plaintext inside an ElGamal ciphertext (without revealing it)</td><td>Ensuring the voter knows the vote they cast</td></tr>
+<tr><td><strong>Not Identity (NotId)</strong></td><td>An ElGamal ciphertext does not encrypt the group identity</td><td>Preventing malformed or trivial ballot fields</td></tr>
+<tr><td><strong>Verifiable Decryption</strong></td><td>An ElGamal ciphertext has been correctly decrypted under a public key scheme</td><td>Publicly auditable tallying</td></tr>
 <tr><td><strong>Designated Verifier</strong></td><td>Proof validity can be checked only by a specific verifier with secret data</td><td>Restricting credential checks to the voter</td></tr>
-<tr><td><strong>Shuffle</strong></td><td>A list of ciphertexts was permuted and re-randomized correctly</td><td>Verifiable mixing of ballots in anonymization</td></tr>
+<tr><td><strong>Shuffle</strong></td><td>A list of ElGamal ciphertexts was permuted and re-randomized correctly</td><td>Verifiable mixing of ballots in anonymization</td></tr>
 </tbody></table>
 </div>
 <h2 id="example-3"><a class="header" href="#example-3">Example</a></h2>
