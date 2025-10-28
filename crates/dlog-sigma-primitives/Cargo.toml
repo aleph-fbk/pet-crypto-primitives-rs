@@ -15,7 +15,7 @@ keywords.workspace = true
 categories.workspace = true
 
 [dependencies]
-dlog-group = { path = "../dlog-group", default-features = false}
+dlog-group = { version = "0.1.0", path = "../dlog-group", default-features = false}
 zeroize = { workspace = true }
 serde = { workspace = true, features = ["derive"] }
 merlin = { workspace = true }
