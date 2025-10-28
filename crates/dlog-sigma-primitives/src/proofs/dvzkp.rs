@@ -120,7 +120,7 @@ impl<G: Group> DesignatedPair<G> {
 }
 
 /// Public inputs for the DV statement.
-/// 
+///
 /// `S0: P0 = [x] B0`. Those are the values exposed Designated Verifier.
 /// `S1: P1A = [x] B1A` and `P1B = [x] B1B`.
 /// Constraint: B1A and B1B must be independent generators
