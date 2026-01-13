@@ -19,8 +19,8 @@ use crate::{error::Error, proofs::ver_decr::DecOkPublicBorrowed};
 use super::ciphertext::{Ciphertext, DiscreteLogTable, ExtendedCiphertext};
 
 /// Secret wrapper around a group scalar that zeroizes on drop.
-#[derive(Debug, Zeroize, ZeroizeOnDrop)]
-pub struct SecretScalar<G: Group>(pub(crate) G::Scalar);
+#[derive(Debug, Zeroize, ZeroizeOnDrop, Clone)]
+pub struct SecretScalar<G: Group>(pub G::Scalar);
 
 impl<G: Group> SecretScalar<G> {
     pub fn new<R: RngCore + CryptoRng>(rng: &mut R) -> Self {
@@ -109,7 +109,7 @@ impl<G: Group> ops::SubAssign<&G::Scalar> for SecretScalar<G> {
 }
 
 /// M-ElGamal Secret Keys (sk1, sk2).
-#[derive(Debug, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Clone, Zeroize, ZeroizeOnDrop)]
 pub struct SecretKey<G: Group>(SecretScalar<G>, SecretScalar<G>);
 
 impl<G: Group> SecretKey<G> {

@@ -353,10 +353,10 @@ impl<G: Group> DiscreteLogTable<G> {
 }
 
 /// Convenience extension: ciphertext + stored randomness.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ExtendedCiphertext<G: Group> {
     pub inner: Ciphertext<G>,
-    pub(crate) random_scalar: SecretScalar<G>,
+    pub random_scalar: SecretScalar<G>,
 }
 
 impl<G: Group> ExtendedCiphertext<G> {

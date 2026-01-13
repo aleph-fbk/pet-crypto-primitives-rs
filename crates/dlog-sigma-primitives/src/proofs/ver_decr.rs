@@ -32,6 +32,7 @@
 //! claimed plaintext, without revealing the secret key.
 
 use dlog_group::serde::{PointHelper, ScalarHelper};
+use crate::serde::CiphertextHelper;
 use serde::{Deserialize, Serialize};
 
 use dlog_group::group::Group;
@@ -76,6 +77,12 @@ impl<'a, G: Group> DecOkPublicBorrowed<'a, G> {
 /// Non-interactive proof object.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct DecOk<G: Group> {
+    // not necessary, just usability, better way would have been to wrap it in another struct
+    #[serde(with = "PointHelper::<G>")]
+    pub plaintext: G::Point, 
+    #[serde(with = "CiphertextHelper::<G>")]
+    pub ciphertext: Ciphertext<G>,
+
     #[serde(with = "PointHelper::<G>")]
     commit_pk: G::Point, // K
     #[serde(with = "PointHelper::<G>")]
@@ -94,6 +101,8 @@ impl<G: Group> Proof for DecOk<G> {
 /// Ephemeral prover state.
 #[derive(Debug, Zeroize, ZeroizeOnDrop)]
 pub struct DecOkState<G: Group> {
+    plaintext: G::Point,
+    ciphertext: Ciphertext<G>,
     t1: SecretScalar<G>,
     t2: SecretScalar<G>,
     K: Option<G::Point>,
@@ -121,8 +130,10 @@ impl<G: Group> SigmaProtocol for DecOkProtocol<G> {
     }
 
     // Sample ephemeral randomness.
-    fn init<R: RngCore + CryptoRng>(_: Self::Public<'_>, rng: &mut R) -> Self::State {
+    fn init<R: RngCore + CryptoRng>(public: Self::Public<'_>, rng: &mut R) -> Self::State {
         DecOkState {
+            plaintext: public.plaintext.clone(),
+            ciphertext: public.ct.clone(),
             t1: SecretScalar::new(rng),
             t2: SecretScalar::new(rng),
             K: None,
@@ -159,6 +170,8 @@ impl<G: Group> SigmaProtocol for DecOkProtocol<G> {
         let z2 = c * x2 + st.t2.expose();
 
         DecOk {
+            plaintext: st.plaintext,
+            ciphertext: st.ciphertext,
             commit_pk: st.K.take().unwrap(),
             commit_ct: st.T.take().unwrap(),
             z1,

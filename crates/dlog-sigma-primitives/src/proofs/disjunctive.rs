@@ -46,10 +46,10 @@
 //! let (_sk, pk) = KeyPair::new_from_params(&params, &mut rng).into_tuple();
 //!
 //! // Discrete set S = {v0, v1}. We prove that C encrypts v1.
-//! let values = [Scalar::from(0u64), Scalar::from(10u64)].to_vec();
-//! let (ct, r) = pk.encrypt(Curve::generator() * &values[1], &params, &mut rng).into_tuple();
+//! let values = [0u64, 10u64].to_vec();
+//! let (ct, r) = pk.encrypt(Curve::generator() * &<Curve as dlog_group::group::GroupScalar>::Scalar::from(values[1]), &params, &mut rng).into_tuple();
 //!
-//! let public = OrPublicBorrowed::<Curve>::new(&pk, &params, &ct, &values);
+//! let public = OrPublicBorrowed::<Curve>::new(&pk, &params, ct, &values);
 //! let witness = OrWitness::new(1, r, values.len()).unwrap();
 //!
 //! // Prove (one-shot).
@@ -85,16 +85,16 @@ use crate::{
 pub struct OrPublicBorrowed<'a, G: Group> {
     pub pk: &'a PublicKey<G>,
     pub params: &'a ElGamalParams<G>,
-    pub ct: &'a Ciphertext<G>,
-    pub values: &'a [G::Scalar],
+    pub ct: Ciphertext<G>,
+    pub values: &'a [u64],
 }
 
 impl<'a, G: Group> OrPublicBorrowed<'a, G> {
     pub fn new(
         pk: &'a PublicKey<G>,
         params: &'a ElGamalParams<G>,
-        ct: &'a Ciphertext<G>,
-        values: &'a [G::Scalar],
+        ct: Ciphertext<G>,
+        values: &'a [u64],
     ) -> Self {
         Self {
             pk,
@@ -106,7 +106,7 @@ impl<'a, G: Group> OrPublicBorrowed<'a, G> {
 }
 
 /// Prover's witness.
-#[derive(Debug, Zeroize, ZeroizeOnDrop)]
+#[derive(Debug, Zeroize, ZeroizeOnDrop, Clone)]
 pub struct OrWitness<G: Group> {
     /// Index related to the exact value encrypted.
     pub index: usize,
@@ -165,12 +165,12 @@ impl<G: Group> SigmaProtocol for OrProtocol<G> {
         tr.append_point::<G>(b"H", &public.pk.h);
         tr.append_point::<G>(b"G1", &public.params.g1);
         tr.append_point::<G>(b"G2", &public.params.g2);
-        tr.append_ciphertext::<G>(b"CT", public.ct);
+        tr.append_ciphertext::<G>(b"CT", &public.ct);
         // absorb values count and the list
         let n = public.values.len() as u64;
         tr.append_bytes(b"n", &n.to_le_bytes());
         for v in public.values.iter() {
-            tr.append_scalar::<G>(b"", v);
+            tr.append_scalar::<G>(b"", &G::Scalar::from(*v));
         }
     }
 
@@ -211,7 +211,7 @@ impl<G: Group> SigmaProtocol for OrProtocol<G> {
                 let adjusted = Ciphertext::<G> {
                     random_point: public.ct.random_point,
                     random_point2: public.ct.random_point2,
-                    blinded_point: public.ct.blinded_point - &(G::generator() * v_i),
+                    blinded_point: public.ct.blinded_point - &(G::generator() * &G::Scalar::from(*v_i)),
                 };
                 let I_i = (base * &st.sim_z[i]) - (adjusted * &st.sim_c[i]);
                 tr.append_ciphertext::<G>(b"I", &I_i);
@@ -287,7 +287,7 @@ impl<G: Group> SigmaProtocol for OrProtocol<G> {
             let adjusted = Ciphertext::<G> {
                 random_point: public.ct.random_point,
                 random_point2: public.ct.random_point2,
-                blinded_point: public.ct.blinded_point - &(G::generator() * v_i),
+                blinded_point: public.ct.blinded_point - &(G::generator() * &G::Scalar::from(*v_i)),
             };
             let lhs = base * &proof.responses[i];
             let rhs = proof.commitments[i] + (adjusted * &proof.challenges[i]);
@@ -315,17 +315,17 @@ mod tests {
     #[test]
     fn verify_or_proof_happy_path() {
         let (mut rng, params, pk) = setup();
-        let values = [Scalar::from(0u64), Scalar::from(10u64)].to_vec();
+        let values = [0u64, 10u64].to_vec();
         // Encrypt the value 0
         let index = 0;
         let (ct, r) = pk
-            .encrypt(Curve::generator() * values[index], &params, &mut rng)
+            .encrypt(Curve::generator() * &<Curve as dlog_group::group::GroupScalar>::Scalar::from(values[index]), &params, &mut rng)
             .into_tuple();
         // build public
         let public = OrPublicBorrowed::<Curve> {
             pk: &pk,
             params: &params,
-            ct: &ct,
+            ct: ct,
             values: &values,
         };
         let wit = OrWitness { index, r };
@@ -342,17 +342,17 @@ mod tests {
     fn or_fails_on_values_permutation() {
         // Reordering the public value set changes the transcript and must fail.
         let (mut rng, params, pk) = setup();
-        let values = [Scalar::from(0u64), Scalar::from(10u64)].to_vec();
+        let values = [0u64, 10u64].to_vec();
         // Encrypt the value 0
         let index = 0;
         let (ct, r) = pk
-            .encrypt(Curve::generator() * values[index], &params, &mut rng)
+            .encrypt(Curve::generator() * &<Curve as dlog_group::group::GroupScalar>::Scalar::from(values[index]), &params, &mut rng)
             .into_tuple();
         // build public
         let public = OrPublicBorrowed::<Curve> {
             pk: &pk,
             params: &params,
-            ct: &ct,
+            ct: ct,
             values: &values,
         };
         let wit = OrWitness { index, r };
@@ -365,7 +365,7 @@ mod tests {
         let public_bad = OrPublicBorrowed::<Curve> {
             pk: &pk,
             params: &params,
-            ct: &ct,
+            ct: ct,
             values: &values_perm,
         };
 
@@ -376,16 +376,16 @@ mod tests {
     #[test]
     fn serde_roundtrip() {
         let (mut rng, params, pk) = setup();
-        let values = [Scalar::from(0u64), Scalar::from(10u64)].to_vec();
+        let values = [0u64, 10u64].to_vec();
         let index = 0;
         let (ct, r) = pk
-            .encrypt(Curve::generator() * values[index], &params, &mut rng)
+            .encrypt(Curve::generator() * &<Curve as dlog_group::group::GroupScalar>::Scalar::from(values[index]), &params, &mut rng)
             .into_tuple();
         // build public
         let public = OrPublicBorrowed::<Curve> {
             pk: &pk,
             params: &params,
-            ct: &ct,
+            ct: ct,
             values: &values,
         };
         let wit = OrWitness { index, r };

@@ -58,7 +58,7 @@ fn zero_basic_round_trip() {
         .encrypt(Curve::identity(), &params, &mut rng)
         .into_tuple();
 
-    let public = ZeroPublicBorrowed::new(&pk, &params, &ct.0);
+    let public = ZeroPublicBorrowed::new(&pk, &params, ct.0);
 
     // Prover
     let mut tr_p = Transcript::new(b"example");
