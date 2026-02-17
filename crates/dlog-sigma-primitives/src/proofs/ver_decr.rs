@@ -31,8 +31,8 @@
 //! This protocol proves that the ciphertext decrypts correctly under the
 //! claimed plaintext, without revealing the secret key.
 
-use dlog_group::serde::{PointHelper, ScalarHelper};
 use crate::serde::CiphertextHelper;
+use dlog_group::serde::{PointHelper, ScalarHelper};
 use serde::{Deserialize, Serialize};
 
 use dlog_group::group::Group;
@@ -79,7 +79,7 @@ impl<'a, G: Group> DecOkPublicBorrowed<'a, G> {
 pub struct DecOk<G: Group> {
     // not necessary, just usability, better way would have been to wrap it in another struct
     #[serde(with = "PointHelper::<G>")]
-    pub plaintext: G::Point, 
+    pub plaintext: G::Point,
     #[serde(with = "CiphertextHelper::<G>")]
     pub ciphertext: Ciphertext<G>,
 
@@ -132,8 +132,8 @@ impl<G: Group> SigmaProtocol for DecOkProtocol<G> {
     // Sample ephemeral randomness.
     fn init<R: RngCore + CryptoRng>(public: Self::Public<'_>, rng: &mut R) -> Self::State {
         DecOkState {
-            plaintext: public.plaintext.clone(),
-            ciphertext: public.ct.clone(),
+            plaintext: *public.plaintext,
+            ciphertext: *public.ct,
             t1: SecretScalar::new(rng),
             t2: SecretScalar::new(rng),
             K: None,

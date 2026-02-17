@@ -153,7 +153,9 @@ pub trait SigmaProtocol {
         transcript: &mut Transcript,
         rng: &mut R,
     ) -> Self::Proof {
-        transcript.start_proof(Self::DOMAIN, public.clone(), |tr, p| Self::absorb_public(p, tr));
+        transcript.start_proof(Self::DOMAIN, public.clone(), |tr, p| {
+            Self::absorb_public(p, tr)
+        });
         let mut state = Self::init(public.clone(), rng);
         Self::commit(public, &mut state, witness, transcript);
         Self::complete(state, witness, transcript)
@@ -165,7 +167,9 @@ pub trait SigmaProtocol {
         proof: &Self::Proof,
         transcript: &mut Transcript,
     ) -> Result<(), Error> {
-        transcript.start_proof(Self::DOMAIN, public.clone(), |tr, p| Self::absorb_public(p, tr));
+        transcript.start_proof(Self::DOMAIN, public.clone(), |tr, p| {
+            Self::absorb_public(p, tr)
+        });
         Self::update_transcript(proof, transcript)?;
         Self::verify_relation(public, proof, transcript)
     }

@@ -211,7 +211,8 @@ impl<G: Group> SigmaProtocol for OrProtocol<G> {
                 let adjusted = Ciphertext::<G> {
                     random_point: public.ct.random_point,
                     random_point2: public.ct.random_point2,
-                    blinded_point: public.ct.blinded_point - &(G::generator() * &G::Scalar::from(*v_i)),
+                    blinded_point: public.ct.blinded_point
+                        - &(G::generator() * &G::Scalar::from(*v_i)),
                 };
                 let I_i = (base * &st.sim_z[i]) - (adjusted * &st.sim_c[i]);
                 tr.append_ciphertext::<G>(b"I", &I_i);
@@ -319,7 +320,12 @@ mod tests {
         // Encrypt the value 0
         let index = 0;
         let (ct, r) = pk
-            .encrypt(Curve::generator() * &<Curve as dlog_group::group::GroupScalar>::Scalar::from(values[index]), &params, &mut rng)
+            .encrypt(
+                Curve::generator()
+                    * &<Curve as dlog_group::group::GroupScalar>::Scalar::from(values[index]),
+                &params,
+                &mut rng,
+            )
             .into_tuple();
         // build public
         let public = OrPublicBorrowed::<Curve> {
@@ -346,7 +352,12 @@ mod tests {
         // Encrypt the value 0
         let index = 0;
         let (ct, r) = pk
-            .encrypt(Curve::generator() * &<Curve as dlog_group::group::GroupScalar>::Scalar::from(values[index]), &params, &mut rng)
+            .encrypt(
+                Curve::generator()
+                    * &<Curve as dlog_group::group::GroupScalar>::Scalar::from(values[index]),
+                &params,
+                &mut rng,
+            )
             .into_tuple();
         // build public
         let public = OrPublicBorrowed::<Curve> {
@@ -379,7 +390,12 @@ mod tests {
         let values = [0u64, 10u64].to_vec();
         let index = 0;
         let (ct, r) = pk
-            .encrypt(Curve::generator() * &<Curve as dlog_group::group::GroupScalar>::Scalar::from(values[index]), &params, &mut rng)
+            .encrypt(
+                Curve::generator()
+                    * &<Curve as dlog_group::group::GroupScalar>::Scalar::from(values[index]),
+                &params,
+                &mut rng,
+            )
             .into_tuple();
         // build public
         let public = OrPublicBorrowed::<Curve> {

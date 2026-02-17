@@ -9,7 +9,7 @@ use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::{
     elgamal::{
-        ciphertext::{Ciphertext, ExtendedCiphertext},
+        ciphertext::Ciphertext,
         keys::{ElGamalParams, PublicKey},
     },
     error::Error,
@@ -75,13 +75,16 @@ pub struct ExpProtocol<G: Group>(core::marker::PhantomData<G>);
 impl<G: Group> SigmaProtocol for ExpProtocol<G> {
     const DOMAIN: &'static [u8] = b"exp";
 
-    type Public<'a> = ExpPublicBorrowed<'a, G> where Self: 'a;
+    type Public<'a>
+        = ExpPublicBorrowed<'a, G>
+    where
+        Self: 'a;
     type Witness = ExpWitness<G>;
     type Proof = ExpProof<G>;
     type State = ExpState<G>;
 
     fn absorb_public(public: Self::Public<'_>, transcript: &mut Transcript) {
-        transcript.append_point::<G>(b"base", &public.base);
+        transcript.append_point::<G>(b"base", public.base);
         transcript.append_bytes(b"pk", &public.public_key.to_bytes());
         transcript.append_ciphertext(b"ciphertext", public.ciphertext);
     }
@@ -109,7 +112,11 @@ impl<G: Group> SigmaProtocol for ExpProtocol<G> {
         transcript.append_ciphertext(b"commitment", &state.commitment);
     }
 
-    fn complete(state: Self::State, witness: &Self::Witness, transcript: &mut Transcript) -> Self::Proof {
+    fn complete(
+        state: Self::State,
+        witness: &Self::Witness,
+        transcript: &mut Transcript,
+    ) -> Self::Proof {
         let c = transcript.challenge_scalar::<G>(b"c");
         let response1 = c * witness.random_scalar.expose() + state.randomness1.expose();
         let response2 = c * witness.pt.expose() + state.randomness2.expose();
@@ -153,7 +160,7 @@ impl<G: Group> ProofTrait for ExpProof<G> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::elgamal::keys::KeyPair;
+    use crate::elgamal::{ciphertext::ExtendedCiphertext, keys::KeyPair};
     use dlog_group::group::{GroupPoint, GroupScalar};
     use rand::thread_rng;
 
