@@ -161,18 +161,18 @@ impl<G: Group> ProofTrait for ExpProof<G> {
 mod tests {
     use super::*;
     use crate::elgamal::{ciphertext::ExtendedCiphertext, keys::KeyPair};
-    use dlog_group::group::{GroupPoint, GroupScalar};
+    use crate::prelude::{Curve, *};
     use rand::thread_rng;
 
     #[test]
     fn verify_exp_proof() {
         let mut rng = thread_rng();
-        let params: ElGamalParams<crate::Curve> = ElGamalParams::new(&mut rng);
+        let params: ElGamalParams<Curve> = ElGamalParams::new(&mut rng);
         let (_, pk) = KeyPair::new_from_params(&params, &mut rng).into_tuple();
-        let message = <crate::Curve as GroupScalar>::Scalar::random(&mut rng);
+        let message = Curve::scalar_random(&mut rng);
         let ct = ExtendedCiphertext::exp_new(&message, &pk, &params, &mut rng);
 
-        let base = <crate::Curve as GroupPoint>::generator();
+        let base = <Curve as GroupPoint>::generator();
         let public = ExpPublicBorrowed {
             public_key: &pk,
             params: &params,

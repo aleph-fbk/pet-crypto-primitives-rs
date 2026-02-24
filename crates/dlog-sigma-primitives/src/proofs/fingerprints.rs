@@ -103,7 +103,7 @@ impl<G: Group> VerifiableFingerprints<G> {
 
 #[cfg(test)]
 mod test {
-    use dlog_group::{group::GroupPoint, ristretto::RistrettoGroup};
+    use crate::prelude::{Curve, *};
     use rand::thread_rng;
 
     use crate::elgamal::keys::{ElGamalParams, KeyPair};
@@ -113,7 +113,7 @@ mod test {
     #[test]
     fn verify_proof() {
         let mut rng = thread_rng();
-        let params: ElGamalParams<RistrettoGroup> = ElGamalParams::new(&mut rng);
+        let params: ElGamalParams<Curve> = ElGamalParams::new(&mut rng);
         let (_, pk) = KeyPair::new_from_params(&params, &mut rng).into_tuple();
 
         let mut originals_list = vec![];
@@ -121,7 +121,7 @@ mod test {
             let mut originals = vec![];
             // Make a list of random ciphertexts
             for _ in 0..2 {
-                let value = RistrettoGroup::point_random(&mut rng);
+                let value = Curve::point_random(&mut rng);
                 originals.push(pk.encrypt(value, &params, &mut rng).inner);
             }
             originals_list.push(originals);
