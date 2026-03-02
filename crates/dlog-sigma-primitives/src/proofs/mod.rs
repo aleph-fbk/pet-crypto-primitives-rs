@@ -57,8 +57,8 @@ use crate::error::Error;
 // pub mod compound;
 pub mod disjunctive;
 pub mod dvzkp;
-// pub mod exp;
-// pub mod fingerprints;
+pub mod exp;
+pub mod fingerprints;
 pub mod log_equality;
 pub mod not_identity;
 pub mod plaintext;
@@ -77,7 +77,7 @@ pub trait SigmaProtocol {
     /// Borrowed public input (to avoid cloning in implementations).
     ///
     /// Use a thin view struct or a tuple of references.
-    type Public<'a>: Debug + Copy
+    type Public<'a>: Debug + Clone
     where
         Self: 'a;
 
@@ -153,8 +153,10 @@ pub trait SigmaProtocol {
         transcript: &mut Transcript,
         rng: &mut R,
     ) -> Self::Proof {
-        transcript.start_proof(Self::DOMAIN, public, |tr, p| Self::absorb_public(p, tr));
-        let mut state = Self::init(public, rng);
+        transcript.start_proof(Self::DOMAIN, public.clone(), |tr, p| {
+            Self::absorb_public(p, tr)
+        });
+        let mut state = Self::init(public.clone(), rng);
         Self::commit(public, &mut state, witness, transcript);
         Self::complete(state, witness, transcript)
     }
@@ -165,7 +167,9 @@ pub trait SigmaProtocol {
         proof: &Self::Proof,
         transcript: &mut Transcript,
     ) -> Result<(), Error> {
-        transcript.start_proof(Self::DOMAIN, public, |tr, p| Self::absorb_public(p, tr));
+        transcript.start_proof(Self::DOMAIN, public.clone(), |tr, p| {
+            Self::absorb_public(p, tr)
+        });
         Self::update_transcript(proof, transcript)?;
         Self::verify_relation(public, proof, transcript)
     }
@@ -219,7 +223,7 @@ pub trait TranscriptForGroup {
     /// for the protocol. It is executed immediately after domain separation.
     fn start_proof<P, F>(&mut self, proof_label: &'static [u8], public: P, absorb_public: F)
     where
-        P: Copy,
+        P: Clone,
         F: FnOnce(&mut Transcript, P);
 
     /// Append raw bytes into the transcript under a stable label.
@@ -246,7 +250,7 @@ pub trait TranscriptForGroup {
 impl TranscriptForGroup for Transcript {
     fn start_proof<P, F>(&mut self, proof_label: &'static [u8], public: P, absorb_public: F)
     where
-        P: Copy,
+        P: Clone,
         F: FnOnce(&mut Transcript, P),
     {
         self.append_message(b"dom-sep", proof_label);

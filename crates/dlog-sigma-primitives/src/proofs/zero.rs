@@ -45,7 +45,7 @@
 //! // Zero plaintext (group identity)
 //! let ct = pk.encrypt(Curve::identity(), &params, &mut rng).into_tuple();
 //!
-//! let public = ZeroPublicBorrowed { pk: &pk, params: &params, ct: &ct.0 };
+//! let public = ZeroPublicBorrowed { pk: &pk, params: &params, ct: ct.0 };
 //!
 //! // Prover
 //! let mut tr_p = Transcript::new(b"example");
@@ -88,11 +88,11 @@ pub struct ZeroPublicBorrowed<'a, G: Group> {
     /// ElGamal bases g1 and g2.
     pub params: &'a ElGamalParams<G>,
     /// Ciphertext to prove as zero-plaintext.
-    pub ct: &'a Ciphertext<G>,
+    pub ct: Ciphertext<G>,
 }
 
 impl<'a, G: Group> ZeroPublicBorrowed<'a, G> {
-    pub fn new(pk: &'a PublicKey<G>, params: &'a ElGamalParams<G>, ct: &'a Ciphertext<G>) -> Self {
+    pub fn new(pk: &'a PublicKey<G>, params: &'a ElGamalParams<G>, ct: Ciphertext<G>) -> Self {
         Self { pk, params, ct }
     }
 }
@@ -134,7 +134,7 @@ impl<G: Group> SigmaProtocol for ZeroProtocol<G> {
         tr.append_point::<G>(b"H", &public.pk.h);
         tr.append_point::<G>(b"G1", &public.params.g1);
         tr.append_point::<G>(b"G2", &public.params.g2);
-        tr.append_ciphertext::<G>(b"CT", public.ct);
+        tr.append_ciphertext::<G>(b"CT", &public.ct);
     }
 
     /// Initialize the randomness and the prover state.
@@ -193,7 +193,7 @@ impl<G: Group> SigmaProtocol for ZeroProtocol<G> {
 
         // Check: [z]PK == I + [c]C
         let lhs = public.pk.to_ciphertext(public.params) * &proof.response;
-        let rhs = proof.commitment + (*public.ct * &c);
+        let rhs = proof.commitment + (public.ct * &c);
 
         if lhs == rhs {
             Ok(())
@@ -227,7 +227,7 @@ mod tests {
         let public = ZeroPublicBorrowed {
             pk: &pk,
             params: &params,
-            ct: &ct.0,
+            ct: ct.0,
         };
 
         // Prover
@@ -247,7 +247,7 @@ mod tests {
         let public = ZeroPublicBorrowed {
             pk: &pk,
             params: &params,
-            ct: &ct.0,
+            ct: ct.0,
         };
 
         // get two different challenges
@@ -270,7 +270,7 @@ mod tests {
         let public = ZeroPublicBorrowed {
             pk: &pk,
             params: &params,
-            ct: &ct.0,
+            ct: ct.0,
         };
 
         // Prover

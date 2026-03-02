@@ -5,7 +5,6 @@ use serde::{Deserialize, Serialize};
 
 use dlog_group::group::Group;
 use rand_core::{CryptoRng, RngCore};
-use zeroize::Zeroize;
 
 use crate::{elgamal::keys::SecretScalar, error::Error};
 
@@ -192,9 +191,8 @@ impl<G: Group> ops::Mul<&G::Scalar> for Pedersen<G> {
 }
 
 /// Pedersen commitment plus the blinding scalar.
-#[derive(Debug, Zeroize)]
+#[derive(Debug)]
 pub struct ExtendedPedersen<G: Group> {
-    #[zeroize(skip)]
     pub inner: Pedersen<G>,
     pub randomness: SecretScalar<G>,
 }
